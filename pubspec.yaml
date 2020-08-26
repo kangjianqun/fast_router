@@ -1,8 +1,8 @@
 name: fast_router
 description: A new router package.
 version: 1.0.0
-author:
-homepage:
+author: kang_1994@outlook.com
+homepage: https://github.com/StrangerKjq/fast_router
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

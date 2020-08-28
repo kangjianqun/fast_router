@@ -18,10 +18,10 @@ initRouter(Color color, Widget notFoundPage) {
 }
 
 abstract class ModuleRouter implements IModuleRouter {
-  Router router;
+  FastRouter router;
 
   /// 子类无需调用
-  void initRouter(Router router) {
+  void initRouter(FastRouter router) {
     this.router = router;
     initPath();
   }
@@ -82,16 +82,16 @@ RoutePredicate withName(String path) {
 }
 
 /// 路由使用
-class Router {
+class FastRouter {
   /// 存储定义路线的树结构
   final RouteTree _routeTree = RouteTree();
 
   /// 未定义路线时的通用处理程序
   Handler notFoundHandler;
 
-  static Router _router;
+  static FastRouter _router;
 
-  static Router get router => _router;
+  static FastRouter get router => _router;
 
   /// 自定义路由观察者
   static RouterObserver get observer => RouterObserver();
@@ -99,12 +99,12 @@ class Router {
   /// 观察者对象的上下文
   static BuildContext get context => RouterObserver().navigator.context;
 
-  static void configureRouters(Router config, List<ModuleRouter> listRouter,
+  static void configureRouters(FastRouter config, List<ModuleRouter> listRouter,
       {Handler emptyPage}) {
-    Router._router = config;
+    FastRouter._router = config;
 
     /// 指定路由跳转错误返回页
-    Router._router.notFoundHandler = emptyPage ??
+    FastRouter._router.notFoundHandler = emptyPage ??
         Handler(handlerFunc:
             (BuildContext context, Map<String, List<String>> params) {
           debugPrint("未找到目标页");
@@ -112,7 +112,7 @@ class Router {
         });
 
     listRouter
-        .forEach((moduleRouter) => moduleRouter.initRouter(Router._router));
+        .forEach((moduleRouter) => moduleRouter.initRouter(FastRouter._router));
   }
 
   /// 为传递的[RouteHandler]创建[PageRoute]定义。您可以选择提供默认的过渡类型。
@@ -187,7 +187,7 @@ class Router {
   /// 回退
   _popBack({String targetPath, String showPage, result}) {
     if (showPage != null && showPage.isNotEmpty) {
-      Router._router._navigate(showPage,
+      FastRouter._router._navigate(showPage,
           targetPath: targetPath, replace: true, pop: true);
     } else if (targetPath != null && targetPath.isNotEmpty) {
       observer.navigator.popUntil(withName(targetPath));
@@ -205,7 +205,7 @@ class Router {
 
   static pushResult(String path, RouterCallback function,
       {bool replace = false}) {
-    Router._router._navigate(path, replace: replace).then((result) {
+    FastRouter._router._navigate(path, replace: replace).then((result) {
       // 页面返回result为null
       if (result == null) return;
       function(result);

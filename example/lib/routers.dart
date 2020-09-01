@@ -1,26 +1,7 @@
-# fast_router
+import 'package:fast_router/fast_router.dart';
 
- 修改自 fluro 的新版本 加入一些新方法
- 日常使用，加入一些便捷方法，可以抛弃Navigator了
- 支持ios  左滑 跟 android原生路由跳转
+import 'article.dart';
 
-初始化路由
-```
-FastRouter.configureRouters(FastRouter(), [Routers()]);
-```
-然后配置 <kbd>navigatorObservers</kbd> 和<kbd>onGenerateRoute</kbd>
-```
- @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorObservers: [FastRouter.observer],
-      onGenerateRoute: FastRouter.router.generator,
-      home: SelectPage(),
-    );
-  }
-```
-新建 Routers 类统一管理路由
-```
 class Routers extends ModuleRouter {
   static String _article = "/article";
 
@@ -57,17 +38,3 @@ class Routers extends ModuleRouter {
     }
   }
 }
-```
-
-页面调用
-```
-  void pushArticle(bool rootRefresh, bool isConfigState, bool isLoadData) {
-    Routers.articlePage(rootRefresh, isConfigState, isLoadData);
-  }
-```
-
- 一个MVVM框架fast_mvvm附带简单的demo,会一直更新，希望支持一下.有问题可以反馈QQ 275918180。
- 博客讲解：https://blog.csdn.net/q948182974/article/details/106613565
-
- 掘金讲解：https://juejin.im/post/5ee86c9b51882543313a0de7
-

@@ -1,14 +1,18 @@
+import 'package:example/EmptyPage.dart';
 import 'package:fast_router/fast_router.dart';
 
 import 'article.dart';
 
 class Routers extends ModuleRouter {
   static String _article = "/article";
+  static String _empty = "/empty";
 
   static void articlePage(bool rootRefresh, bool configState, bool loadData) {
     FastRouter.push("$_article?rootRefresh=$rootRefresh"
         "&configState=$configState&loadData=$loadData");
   }
+
+  static void emptyPage() => FastRouter.push(_empty);
 
   @override
   void initPath() {
@@ -20,6 +24,8 @@ class Routers extends ModuleRouter {
         loadData: parse(parameters["loadData"]?.first),
       ),
     );
+
+    define(_empty, (context, parameters) => EmptyPage());
   }
 
   ///因为相互依赖这里不能依赖 fast_develop ，正常项目依赖fast_develop这个库就行，

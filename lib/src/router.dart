@@ -173,7 +173,9 @@ class FastRouter {
     Navigator.of(context, rootNavigator: true).pop();
   }
 
+  /// 弃用 使 [popBack]
   /// 带参数返回
+  @deprecated
   static void goBackWithParams(BuildContext context, result) {
     Navigator.pop(context, result);
   }
@@ -196,13 +198,24 @@ class FastRouter {
     }
   }
 
-  static push(String path, {String targetPath, bool replace = false}) {
-    _router._navigate(path,
-        targetPath: targetPath,
-        replace: replace,
-        transition: TransitionType.native);
+  static push(
+    String path, {
+    String targetPath,
+    bool replace = false,
+    RouterCallback function,
+  }) {
+    _router
+        ._navigate(path,
+            targetPath: targetPath,
+            replace: replace,
+            transition: TransitionType.native)
+        .then((result) {
+      if (function != null) function(result);
+    });
   }
 
+  /// 弃用 使 [push]
+  @deprecated
   static pushResult(String path, RouterCallback function,
       {bool replace = false}) {
     FastRouter._router._navigate(path, replace: replace).then((result) {

@@ -118,6 +118,10 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
             onTap: () =>
                 pushArticle(false, vm.isConfigState.value, vm.isLoadData.value),
           ),
+          ListTile(
+            title: Text("空页面，不传参数"),
+            onTap: () => Routers.emptyPage(),
+          ),
         ],
       ),
     );

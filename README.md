@@ -23,11 +23,14 @@ FastRouter.configureRouters(FastRouter(), [Routers()]);
 ```
 class Routers extends ModuleRouter {
   static String _article = "/article";
+  static String _empty = "/empty";
 
   static void articlePage(bool rootRefresh, bool configState, bool loadData) {
     FastRouter.push("$_article?rootRefresh=$rootRefresh"
         "&configState=$configState&loadData=$loadData");
   }
+
+  static void emptyPage() => FastRouter.push(_empty);
 
   @override
   void initPath() {
@@ -39,6 +42,8 @@ class Routers extends ModuleRouter {
         loadData: parse(parameters["loadData"]?.first),
       ),
     );
+
+    define(_empty, (context, parameters) => EmptyPage());
   }
 
   ///因为相互依赖这里不能依赖 fast_develop ，正常项目依赖fast_develop这个库就行，
@@ -57,6 +62,7 @@ class Routers extends ModuleRouter {
     }
   }
 }
+
 ```
 
 页面调用
@@ -64,6 +70,11 @@ class Routers extends ModuleRouter {
   void pushArticle(bool rootRefresh, bool isConfigState, bool isLoadData) {
     Routers.articlePage(rootRefresh, isConfigState, isLoadData);
   }
+
+  ListTile(
+              title: Text("空页面，不传参数"),
+              onTap: () => Routers.emptyPage(),
+            )
 ```
 
  一个MVVM框架fast_mvvm附带简单的demo,会一直更新，希望支持一下.有问题可以反馈QQ 275918180。

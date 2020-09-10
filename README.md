@@ -1,7 +1,7 @@
 # fast_router
 
  修改自 fluro 的新版本 加入一些新方法
- 日常使用，加入一些便捷方法，可以抛弃Navigator了
+ 日常使用，加入一些便捷方法不需要context，可以抛弃Navigator
  支持ios  左滑 跟 android原生路由跳转
 
 初始化路由

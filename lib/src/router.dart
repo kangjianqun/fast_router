@@ -9,14 +9,15 @@ import 'tree.dart';
 
 typedef RouterCallback = void Function(dynamic data);
 
-Color bgColor = Colors.white;
+Color fastRouterBgColor = Colors.white;
 Widget notFoundWidget = Center(child: Text("未找到目标页面"));
 
-initRouter(Color color, Widget notFoundPage) {
-  if (color != null) bgColor = color;
+initRouter(Color backgroundColor, Widget notFoundPage) {
+  if (backgroundColor != null) fastRouterBgColor = backgroundColor;
   if (notFoundPage != null) notFoundWidget = notFoundPage;
 }
 
+///  定义路由对应的页面
 abstract class ModuleRouter implements IModuleRouter {
   FastRouter router;
 
@@ -32,7 +33,7 @@ abstract class ModuleRouter implements IModuleRouter {
   }
 }
 
-///  接口
+/// 接口
 abstract class IModuleRouter {
   void initPath();
 }
@@ -86,7 +87,7 @@ class FastRouter {
   /// 存储定义路线的树结构
   final RouteTree _routeTree = RouteTree();
 
-  /// 未定义路线时的通用处理程序
+  /// 未定义路线时的通用处理
   Handler notFoundHandler;
 
   static FastRouter _router;
@@ -99,6 +100,7 @@ class FastRouter {
   /// 观察者对象的上下文
   static BuildContext get context => RouterObserver().navigator.context;
 
+  /// 配置路由
   static void configureRouters(FastRouter config, List<ModuleRouter> listRouter,
       {Handler emptyPage}) {
     FastRouter._router = config;
@@ -108,7 +110,7 @@ class FastRouter {
         Handler(handlerFunc:
             (BuildContext context, Map<String, List<String>> params) {
           debugPrint("未找到目标页");
-          return Container(color: bgColor, child: notFoundWidget);
+          return Container(color: fastRouterBgColor, child: notFoundWidget);
         });
 
     listRouter
@@ -173,17 +175,33 @@ class FastRouter {
     Navigator.of(context, rootNavigator: true).pop();
   }
 
-  /// 弃用 使 [popBack]
-  /// 带参数返回
-  @deprecated
-  static void goBackWithParams(BuildContext context, result) {
-    Navigator.pop(context, result);
-  }
-
   /// [targetPath]目标页面   [openPage]打开页面  [result]数据
   static popBack({String targetPath, String openPage, result}) {
     _router._popBack(
         targetPath: targetPath, showPage: openPage, result: result);
+  }
+
+  static push(
+    String path, {
+    String targetPath,
+    bool replace = false,
+    RouterCallback callback,
+    TransitionType transition = TransitionType.native,
+    Duration transitionDuration = const Duration(milliseconds: 250),
+    RouteTransitionsBuilder transitionBuilder,
+  }) {
+    _router
+        ._navigate(
+      path,
+      targetPath: targetPath,
+      replace: replace,
+      transition: transition,
+      transitionDuration: transitionDuration,
+      transitionBuilder: transitionBuilder,
+    )
+        .then((result) {
+      if (callback != null) callback(result);
+    });
   }
 
   /// 回退
@@ -196,33 +214,6 @@ class FastRouter {
     } else {
       observer.navigator.pop(result);
     }
-  }
-
-  static push(
-    String path, {
-    String targetPath,
-    bool replace = false,
-    RouterCallback function,
-  }) {
-    _router
-        ._navigate(path,
-            targetPath: targetPath,
-            replace: replace,
-            transition: TransitionType.native)
-        .then((result) {
-      if (function != null) function(result);
-    });
-  }
-
-  /// 弃用 使 [push]
-  @deprecated
-  static pushResult(String path, RouterCallback function,
-      {bool replace = false}) {
-    FastRouter._router._navigate(path, replace: replace).then((result) {
-      // 页面返回result为null
-      if (result == null) return;
-      function(result);
-    }).catchError((error) => print("$error"));
   }
 
   /// 跳转页面

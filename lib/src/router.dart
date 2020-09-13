@@ -28,8 +28,13 @@ abstract class ModuleRouter implements IModuleRouter {
   }
 
   ///路径与页匹配
-  void define(String path, HandlerFunc handlerFunc) {
-    router.define(path, handler: Handler(handlerFunc: handlerFunc));
+  void define(String path, HandlerFunc handlerFunc,
+      {TransitionType transitionType}) {
+    router.define(
+      path,
+      handler: Handler(handlerFunc: handlerFunc),
+      transitionType: transitionType,
+    );
   }
 }
 
@@ -106,12 +111,13 @@ class FastRouter {
     FastRouter._router = config;
 
     /// 指定路由跳转错误返回页
-    FastRouter._router.notFoundHandler = emptyPage ??
-        Handler(handlerFunc:
-            (BuildContext context, Map<String, List<String>> params) {
-          debugPrint("未找到目标页");
-          return Container(color: fastRouterBgColor, child: notFoundWidget);
-        });
+    FastRouter._router.notFoundHandler = emptyPage;
+    FastRouter._router.notFoundHandler ??= Handler(
+      handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+        debugPrint("未找到目标页");
+        return Container(color: fastRouterBgColor, child: notFoundWidget);
+      },
+    );
 
     listRouter
         .forEach((moduleRouter) => moduleRouter.initRouter(FastRouter._router));
@@ -131,9 +137,7 @@ class FastRouter {
         (RouteSettings routeSettings, Map<String, List<String>> parameters) {
       return MaterialPageRoute<Null>(
         settings: routeSettings,
-        builder: (BuildContext context) {
-          return notFoundHandler.handlerFunc(context, parameters);
-        },
+        builder: (context) => notFoundHandler.handlerFunc(context, parameters),
       );
     };
     return creator(RouteSettings(name: path), null);
@@ -226,7 +230,7 @@ class FastRouter {
     RouteTransitionsBuilder transitionBuilder,
     bool pop = false,
   }) {
-    RouteMatch routeMatch = matchRoute(showPath,
+    RouteMatch routeMatch = _matchRoute(showPath,
         buildContext: context,
         transitionType: transition,
         transitionsBuilder: transitionBuilder,
@@ -279,8 +283,7 @@ class FastRouter {
     return future;
   }
 
-  ///
-  RouteMatch matchRoute(String path,
+  RouteMatch _matchRoute(String path,
       {BuildContext buildContext,
       RouteSettings routeSettings,
       TransitionType transitionType = TransitionType.native,
@@ -376,7 +379,7 @@ class FastRouter {
   /// property as callback to create routes that can be used with the [Navigator] class.
   Route<dynamic> generator(RouteSettings routeSettings) {
     RouteMatch match =
-        matchRoute(routeSettings.name, routeSettings: routeSettings);
+        _matchRoute(routeSettings.name, routeSettings: routeSettings);
     return match.route;
   }
 

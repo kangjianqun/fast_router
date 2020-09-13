@@ -1,7 +1,12 @@
+## [1.0.3+2]
+ModuleRouter -> define 新增 TransitionType transitionType配置 
+
 ## [1.0.3+1]
-删除弃用的方法 \n
-修改 push 的参数 function 为 callback \n
-增加部分注释 \n
+删除弃用的方法
+
+修改 push 的参数 function 为 callback
+
+增加部分注释
 
 ## [1.0.3]
 新增 example 不传参数跳转

@@ -23,6 +23,7 @@ class Routers extends ModuleRouter {
         configState: parse(parameters["configState"]?.first),
         loadData: parse(parameters["loadData"]?.first),
       ),
+      transitionType: TransitionType.fadeIn,
     );
 
     define(_empty, (context, parameters) => EmptyPage());

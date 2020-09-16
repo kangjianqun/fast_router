@@ -194,8 +194,8 @@ class FastRouter {
     String targetPath,
     bool replace = false,
     RouterCallback callback,
-    TransitionType transition = TransitionType.native,
-    Duration transitionDuration = const Duration(milliseconds: 250),
+    TransitionType transition,
+    Duration transitionDuration,
     RouteTransitionsBuilder transitionBuilder,
   }) {
     _router
@@ -229,7 +229,7 @@ class FastRouter {
     String showPath, {
     String targetPath,
     bool replace = false,
-    TransitionType transition = TransitionType.native,
+    TransitionType transition,
     Duration transitionDuration,
     RouteTransitionsBuilder transitionBuilder,
     bool pop = false,
@@ -290,7 +290,7 @@ class FastRouter {
   RouteMatch _matchRoute(String path,
       {BuildContext buildContext,
       RouteSettings routeSettings,
-      TransitionType transitionType = TransitionType.native,
+      TransitionType transitionType,
       Duration transitionDuration,
       RouteTransitionsBuilder transitionsBuilder}) {
     RouteSettings settingsToUse = routeSettings;

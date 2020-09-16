@@ -301,8 +301,9 @@ class FastRouter {
     AppRoute route = match?.route;
     Handler handler = (route != null ? route.handler : notFoundHandler);
     var transition = transitionType;
-    transition ??=
-        (route != null) ? route.transitionType : TransitionType.native;
+    transition ??= (route != null && route.transitionType != null)
+        ? route.transitionType
+        : TransitionType.native;
 
     if (route == null && notFoundHandler == null) {
       return RouteMatch(

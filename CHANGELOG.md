@@ -1,3 +1,8 @@
+## [1.0.3+3]
+FastRouter-> configureRouters  新增 Duration transitionDuration
+
+路由跳转的过渡时间
+
 ## [1.0.3+2]
 ModuleRouter -> define 新增 TransitionType transitionType配置 
 
@@ -21,4 +26,4 @@ ModuleRouter -> define 新增 TransitionType transitionType配置
 
 ## [1.0.0]
 
-修改自 fluro 的新版本 加入一些新方法 , 作者自己项目正常使用 首次提交
+修改自 fluro 的新版本 加入一些新方法

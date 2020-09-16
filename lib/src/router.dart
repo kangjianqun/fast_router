@@ -10,6 +10,7 @@ import 'tree.dart';
 typedef RouterCallback = void Function(dynamic data);
 
 Color fastRouterBgColor = Colors.white;
+Duration fastRouterTransitionDuration = Duration(milliseconds: 250);
 Widget notFoundWidget = Center(child: Text("未找到目标页面"));
 
 initRouter(Color backgroundColor, Widget notFoundPage) {
@@ -107,7 +108,7 @@ class FastRouter {
 
   /// 配置路由
   static void configureRouters(FastRouter config, List<ModuleRouter> listRouter,
-      {Handler emptyPage}) {
+      {Handler emptyPage, Duration transitionDuration}) {
     FastRouter._router = config;
 
     /// 指定路由跳转错误返回页
@@ -118,6 +119,9 @@ class FastRouter {
         return Container(color: fastRouterBgColor, child: notFoundWidget);
       },
     );
+
+    if (transitionDuration != null)
+      fastRouterTransitionDuration = transitionDuration;
 
     listRouter
         .forEach((moduleRouter) => moduleRouter.initRouter(FastRouter._router));
@@ -226,7 +230,7 @@ class FastRouter {
     String targetPath,
     bool replace = false,
     TransitionType transition = TransitionType.native,
-    Duration transitionDuration = const Duration(milliseconds: 250),
+    Duration transitionDuration,
     RouteTransitionsBuilder transitionBuilder,
     bool pop = false,
   }) {
@@ -287,7 +291,7 @@ class FastRouter {
       {BuildContext buildContext,
       RouteSettings routeSettings,
       TransitionType transitionType = TransitionType.native,
-      Duration transitionDuration = const Duration(milliseconds: 250),
+      Duration transitionDuration,
       RouteTransitionsBuilder transitionsBuilder}) {
     RouteSettings settingsToUse = routeSettings;
     if (routeSettings == null) {
@@ -363,7 +367,8 @@ class FastRouter {
               Animation<double> secondaryAnimation) {
             return handler.handlerFunc(context, parameters);
           },
-          transitionDuration: transitionDuration,
+          transitionDuration:
+              transitionDuration ?? fastRouterTransitionDuration,
           transitionsBuilder: routeTransitionsBuilder,
         );
       }

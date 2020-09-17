@@ -114,7 +114,7 @@ class FastRouter {
     /// 指定路由跳转错误返回页
     FastRouter._router.notFoundHandler = emptyPage;
     FastRouter._router.notFoundHandler ??= Handler(
-      handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      handlerFunc: (context, params, arguments) {
         debugPrint("未找到目标页");
         return Container(color: fastRouterBgColor, child: notFoundWidget);
       },
@@ -137,14 +137,11 @@ class FastRouter {
 
   /// 未找到路径
   Route<Null> _notFoundRoute(String path) {
-    RouteCreator<Null> creator =
-        (RouteSettings routeSettings, Map<String, List<String>> parameters) {
-      return MaterialPageRoute<Null>(
-        settings: routeSettings,
-        builder: (context) => notFoundHandler.handlerFunc(context, parameters),
-      );
-    };
-    return creator(RouteSettings(name: path), null);
+    var routeSettings = RouteSettings(name: path);
+    return MaterialPageRoute<Null>(
+      settings: routeSettings,
+      builder: (context) => notFoundHandler.handlerFunc(context, null, null),
+    );
   }
 
   RouteTransitionsBuilder _standardTransitionsBuilder(
@@ -193,6 +190,7 @@ class FastRouter {
     String path, {
     String targetPath,
     bool replace = false,
+    Object arguments,
     RouterCallback callback,
     TransitionType transition,
     Duration transitionDuration,
@@ -203,6 +201,7 @@ class FastRouter {
       path,
       targetPath: targetPath,
       replace: replace,
+      arguments: arguments,
       transition: transition,
       transitionDuration: transitionDuration,
       transitionBuilder: transitionBuilder,
@@ -229,6 +228,7 @@ class FastRouter {
     String showPath, {
     String targetPath,
     bool replace = false,
+    Object arguments,
     TransitionType transition,
     Duration transitionDuration,
     RouteTransitionsBuilder transitionBuilder,
@@ -237,6 +237,7 @@ class FastRouter {
     RouteMatch routeMatch = _matchRoute(showPath,
         buildContext: context,
         transitionType: transition,
+        arguments: arguments,
         transitionsBuilder: transitionBuilder,
         transitionDuration: transitionDuration);
     Route<dynamic> route = routeMatch.route;
@@ -287,97 +288,100 @@ class FastRouter {
     return future;
   }
 
+  /// 匹配路由 [arguments] 参数
   RouteMatch _matchRoute(String path,
       {BuildContext buildContext,
-      RouteSettings routeSettings,
+      Object arguments,
       TransitionType transitionType,
       Duration transitionDuration,
       RouteTransitionsBuilder transitionsBuilder}) {
-    RouteSettings settingsToUse = routeSettings;
-    if (routeSettings == null) {
-      settingsToUse = RouteSettings(name: path);
-    }
     AppRouteMatch match = _routeTree.matchRoute(path);
     AppRoute route = match?.route;
     Handler handler = (route != null ? route.handler : notFoundHandler);
-    var transition = transitionType;
-    transition ??= (route != null && route.transitionType != null)
-        ? route.transitionType
-        : TransitionType.native;
+
+    /// 参数
+    Map<String, List<String>> parameters = match?.parameters;
+    RouteSettings _settings = RouteSettings(
+      name: path,
+      arguments: arguments ?? parameters,
+    );
+
+    var type = transitionType ?? route?.transitionType ?? TransitionType.native;
 
     if (route == null && notFoundHandler == null) {
       return RouteMatch(
           matchType: RouteMatchType.noMatch,
           errorMessage: "No matching route was found");
     }
-    Map<String, List<String>> parameters =
-        match?.parameters ?? <String, List<String>>{};
     if (handler.type == HandlerType.function) {
-      handler.handlerFunc(buildContext, parameters);
+      handler.handlerFunc(buildContext, parameters, arguments);
       return RouteMatch(matchType: RouteMatchType.nonVisual);
     }
 
-    RouteCreator creator =
-        (RouteSettings routeSettings, Map<String, List<String>> parameters) {
-      bool isNativeTransition = (transition == TransitionType.native ||
-          transition == TransitionType.nativeModal);
-      if (isNativeTransition) {
-        if (Platform.isIOS) {
-          return CupertinoPageRoute<dynamic>(
-              settings: routeSettings,
-              fullscreenDialog: transition == TransitionType.nativeModal,
-              builder: (BuildContext context) {
-                return handler.handlerFunc(context, parameters);
-              });
-        } else {
-          return MaterialPageRoute<dynamic>(
-              settings: routeSettings,
-              fullscreenDialog: transition == TransitionType.nativeModal,
-              builder: (BuildContext context) {
-                return handler.handlerFunc(context, parameters);
-              });
-        }
-      } else if (transition == TransitionType.material ||
-          transition == TransitionType.materialFullScreenDialog) {
-        return MaterialPageRoute<dynamic>(
-            settings: routeSettings,
-            fullscreenDialog:
-                transition == TransitionType.materialFullScreenDialog,
-            builder: (BuildContext context) {
-              return handler.handlerFunc(context, parameters);
-            });
-      } else if (transition == TransitionType.cupertino ||
-          transition == TransitionType.cupertinoFullScreenDialog) {
-        return CupertinoPageRoute<dynamic>(
-            settings: routeSettings,
-            fullscreenDialog:
-                transition == TransitionType.cupertinoFullScreenDialog,
-            builder: (BuildContext context) {
-              return handler.handlerFunc(context, parameters);
-            });
-      } else {
-        var routeTransitionsBuilder;
-        if (transition == TransitionType.custom) {
-          routeTransitionsBuilder = transitionsBuilder;
-        } else {
-          routeTransitionsBuilder = _standardTransitionsBuilder(transition);
-        }
-        return PageRouteBuilder<dynamic>(
-          settings: routeSettings,
-          pageBuilder: (BuildContext context, Animation<double> animation,
-              Animation<double> secondaryAnimation) {
-            return handler.handlerFunc(context, parameters);
-          },
-          transitionDuration:
-              transitionDuration ?? fastRouterTransitionDuration,
-          transitionsBuilder: routeTransitionsBuilder,
-        );
-      }
-    };
     return RouteMatch(
       matchType: RouteMatchType.visual,
-      route: creator(settingsToUse, parameters),
+      route: _creatorRouter(
+          _settings, handler, type, transitionsBuilder, transitionDuration),
     );
+  }
+
+  /// 创建路由
+  Route<dynamic> _creatorRouter(
+      RouteSettings settings,
+      Handler handler,
+      TransitionType type,
+      RouteTransitionsBuilder transitionsBuilder,
+      Duration transitionDuration) {
+    bool isNativeTransition =
+        (type == TransitionType.native || type == TransitionType.nativeModal);
+    var _arguments = settings.arguments;
+    Map<String, List<String>> _parameters;
+
+    if (_arguments is Map<String, List<String>>) _parameters = _arguments;
+    if (isNativeTransition) {
+      if (Platform.isIOS) {
+        return CupertinoPageRoute<dynamic>(
+            settings: settings,
+            fullscreenDialog: type == TransitionType.nativeModal,
+            builder: (context) =>
+                handler.handlerFunc(context, _parameters, _arguments));
+      } else {
+        return MaterialPageRoute<dynamic>(
+            settings: settings,
+            fullscreenDialog: type == TransitionType.nativeModal,
+            builder: (context) =>
+                handler.handlerFunc(context, _parameters, _arguments));
+      }
+    } else if (type == TransitionType.material ||
+        type == TransitionType.materialFullScreenDialog) {
+      return MaterialPageRoute<dynamic>(
+          settings: settings,
+          fullscreenDialog: type == TransitionType.materialFullScreenDialog,
+          builder: (context) =>
+              handler.handlerFunc(context, _parameters, _arguments));
+    } else if (type == TransitionType.cupertino ||
+        type == TransitionType.cupertinoFullScreenDialog) {
+      return CupertinoPageRoute<dynamic>(
+          settings: settings,
+          fullscreenDialog: type == TransitionType.cupertinoFullScreenDialog,
+          builder: (context) =>
+              handler.handlerFunc(context, _parameters, _arguments));
+    } else {
+      var routeTransitionsBuilder;
+      if (type == TransitionType.custom) {
+        routeTransitionsBuilder = transitionsBuilder;
+      } else {
+        routeTransitionsBuilder = _standardTransitionsBuilder(type);
+      }
+      return PageRouteBuilder<dynamic>(
+        settings: settings,
+        pageBuilder: (context, Animation<double> animation,
+                Animation<double> secondaryAnimation) =>
+            handler.handlerFunc(context, _parameters, _arguments),
+        transitionDuration: transitionDuration ?? fastRouterTransitionDuration,
+        transitionsBuilder: routeTransitionsBuilder,
+      );
+    }
   }
 
   /// Route generation method. This function can be used as a way to create routes on-the-fly
@@ -385,18 +389,10 @@ class FastRouter {
   /// property as callback to create routes that can be used with the [Navigator] class.
   Route<dynamic> generator(RouteSettings routeSettings) {
     RouteMatch match =
-        _matchRoute(routeSettings.name, routeSettings: routeSettings);
+        _matchRoute(routeSettings.name, arguments: routeSettings.arguments);
     return match.route;
   }
 
-  /// Prints the route tree so you can analyze it.
-  void printTree() {
-    _routeTree.printTree();
-  }
-
-//  /// 跳到WebView页
-//  static goWebViewPage(BuildContext context, String title, String url){
-//    //fluro 不支持传中文,需转换
-//    push(context, '${Routes.webViewPage}?title=${Uri.encodeComponent(title)}&url=${Uri.encodeComponent(url)}');
-//  }
+  /// 打印路由树，以便于您对其进行分析。
+  void printTree() => _routeTree.printTree();
 }

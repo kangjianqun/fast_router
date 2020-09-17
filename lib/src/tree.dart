@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-
 import 'common.dart';
 
 /// 节点类型
@@ -22,9 +21,7 @@ class RouteTreeNode {
   List<RouteTreeNode> nodes = <RouteTreeNode>[];
   RouteTreeNode parent;
 
-  bool isParameter() {
-    return type == RouteTreeNodeType.parameter;
-  }
+  bool isParameter() => type == RouteTreeNodeType.parameter;
 }
 
 /// 应用程序路线匹配
@@ -208,9 +205,7 @@ class RouteTree {
     return null;
   }
 
-  void printTree() {
-    _printSubTree();
-  }
+  void printTree() => _printSubTree();
 
   void _printSubTree({RouteTreeNode parent, int level = 0}) {
     List<RouteTreeNode> nodes = parent != null ? parent.nodes : _nodes;
@@ -230,7 +225,7 @@ class RouteTree {
   RouteTreeNode _nodeForComponent(String component, RouteTreeNode parent) {
     List<RouteTreeNode> nodes = _nodes;
     if (parent != null) {
-      // search parent for sub-node matches
+      /// 在父节点中搜索子节点匹配项
       nodes = parent.nodes;
     }
     for (RouteTreeNode node in nodes) {

@@ -1,12 +1,12 @@
 import 'package:flutter/widgets.dart';
 
-///
+/// 类型
 enum HandlerType {
   route,
   function,
 }
 
-///
+/// 处理
 class Handler {
   Handler({this.type = HandlerType.route, this.handlerFunc});
   final HandlerType type;
@@ -14,14 +14,10 @@ class Handler {
 }
 
 ///
-typedef Route<T> RouteCreator<T>(
-    RouteSettings route, Map<String, List<String>> parameters);
+typedef Widget HandlerFunc(BuildContext context,
+    Map<String, List<String>> parameters, Object arguments);
 
-///
-typedef Widget HandlerFunc(
-    BuildContext context, Map<String, List<String>> parameters);
-
-///
+/// 路由item
 class AppRoute {
   String route;
   dynamic handler;

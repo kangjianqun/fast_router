@@ -1,3 +1,8 @@
+## [1.0.5]
+新增兼容性支持 arguments 详细看 readme
+
+Navigator.of(context).pushNamed(path, arguments: _arguments);
+
 ## [1.0.4+1]
 修复配置兼容性
 

@@ -77,8 +77,10 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
   ViewConfig<SelectVM> initConfig(BuildContext context) =>
       ViewConfig(vm: SelectVM());
 
-  void pushArticle(bool rootRefresh, bool isConfigState, bool isLoadData) {
-    Routers.articlePage(rootRefresh, isConfigState, isLoadData);
+  void pushArticle(bool rootRefresh, bool isConfigState, bool isLoadData,
+      {bool isNew = false, bool isNavigator = false}) {
+    Routers.articlePage(
+        rootRefresh, isConfigState, isLoadData, isNew, isNavigator);
   }
 
   @override
@@ -117,6 +119,25 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
             title: Text("根布局不刷新"),
             onTap: () =>
                 pushArticle(false, vm.isConfigState.value, vm.isLoadData.value),
+          ),
+          ListTile(
+            title: Text("新的参数方式"),
+            onTap: () => pushArticle(
+              true,
+              vm.isConfigState.value,
+              vm.isLoadData.value,
+              isNew: true,
+            ),
+          ),
+          ListTile(
+            title: Text("Navigator的参数方式"),
+            onTap: () => pushArticle(
+              true,
+              vm.isConfigState.value,
+              vm.isLoadData.value,
+              isNew: true,
+              isNavigator: true,
+            ),
           ),
           ListTile(
             title: Text("空页面，不传参数"),

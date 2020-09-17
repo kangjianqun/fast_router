@@ -1,5 +1,6 @@
 import 'package:example/EmptyPage.dart';
 import 'package:fast_router/fast_router.dart';
+import 'package:flutter/widgets.dart';
 
 import 'article.dart';
 
@@ -7,9 +8,20 @@ class Routers extends ModuleRouter {
   static String _article = "/article";
   static String _empty = "/empty";
 
-  static void articlePage(bool rootRefresh, bool configState, bool loadData) {
-    FastRouter.push("$_article?rootRefresh=$rootRefresh"
-        "&configState=$configState&loadData=$loadData");
+  static void articlePage(bool rootRefresh, bool configState, bool loadData,
+      bool isNew, bool isNavigator) {
+    if (isNew) {
+      var _arguments = ArticleParamsData(rootRefresh, configState, loadData);
+      if (isNavigator) {
+        Navigator.of(FastRouter.context)
+            .pushNamed(_article, arguments: _arguments);
+      } else {
+        FastRouter.push(_article, arguments: _arguments);
+      }
+    } else {
+      FastRouter.push("$_article?rootRefresh=$rootRefresh"
+          "&configState=$configState&loadData=$loadData");
+    }
   }
 
   static void emptyPage() => FastRouter.push(_empty);
@@ -18,15 +30,29 @@ class Routers extends ModuleRouter {
   void initPath() {
     define(
       _article,
-      (context, parameters) => ArticlePage(
-        parse(parameters["rootRefresh"]?.first),
-        configState: parse(parameters["configState"]?.first),
-        loadData: parse(parameters["loadData"]?.first),
-      ),
+      (context, parameters, arguments) {
+        var rootRefresh;
+        var configState;
+        var loadData;
+        if (parameters != null) {
+          rootRefresh = parse(parameters["rootRefresh"]?.first);
+          configState = parse(parameters["configState"]?.first);
+          loadData = parse(parameters["loadData"]?.first);
+        } else if (arguments != null && arguments is ArticleParamsData) {
+          rootRefresh = arguments.rootRefresh;
+          configState = arguments.configState;
+          loadData = arguments.loadData;
+        }
+        return ArticlePage(
+          rootRefresh,
+          configState: configState,
+          loadData: loadData,
+        );
+      },
       transitionType: TransitionType.fadeIn,
     );
 
-    define(_empty, (context, parameters) => EmptyPage());
+    define(_empty, (context, parameters, arguments) => EmptyPage());
   }
 
   ///因为相互依赖这里不能依赖 fast_develop ，正常项目依赖fast_develop这个库就行，

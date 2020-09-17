@@ -58,6 +58,16 @@ class ArticleVM
   }
 }
 
+/// 可以是其他 方便统一参数
+class ArticleParamsData {
+  ArticleParamsData(this.rootRefresh, this.configState, this.loadData);
+
+  /// 是否全局刷新
+  final bool rootRefresh;
+  final bool configState;
+  final bool loadData;
+}
+
 class ArticlePage extends StatelessWidget with BaseView<ArticleVM> {
   const ArticlePage(
     this.rootRefresh, {

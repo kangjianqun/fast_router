@@ -301,13 +301,13 @@ class FastRouter {
 
     /// 参数
     Map<String, List<String>> parameters = match?.parameters;
+
     RouteSettings _settings = RouteSettings(
       name: path,
-      arguments: arguments ?? parameters,
+      arguments: arguments ?? parameters.isEmpty ? null : parameters,
     );
 
     var type = transitionType ?? route?.transitionType ?? TransitionType.native;
-
     if (route == null && notFoundHandler == null) {
       return RouteMatch(
           matchType: RouteMatchType.noMatch,

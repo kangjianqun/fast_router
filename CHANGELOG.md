@@ -1,5 +1,8 @@
+## [2.0.1]
+Empty security repair
+
 ## [2.0.0]
-增加Null safety
+stand by Null safety
 
 ## [1.0.5+1]
 修复 当 arguments 空时赋值类型错误

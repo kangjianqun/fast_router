@@ -1,12 +1,11 @@
 name: fast_router
 description: A router management, based on the modified version of fluro, adds more convenient extension function and global implementation without context jump
-version: 2.0.0
-author: kang_1994@outlook.com
+version: 2.0.1
 homepage: https://github.com/StrangerKjq/fast_router
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=2.0.0 <3.0.0"
+  flutter: ">=2.0.0"
 
 dependencies:
   flutter:
@@ -17,4 +16,3 @@ dev_dependencies:
     sdk: flutter
 
 flutter:
-

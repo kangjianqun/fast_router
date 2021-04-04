@@ -13,14 +13,14 @@ Color fastRouterBgColor = Colors.white;
 Duration fastRouterTransitionDuration = Duration(milliseconds: 250);
 Widget notFoundWidget = Center(child: Text("未找到目标页面"));
 
-initRouter(Color backgroundColor, Widget notFoundPage) {
+initRouter(Color? backgroundColor, Widget? notFoundPage) {
   if (backgroundColor != null) fastRouterBgColor = backgroundColor;
   if (notFoundPage != null) notFoundWidget = notFoundPage;
 }
 
 ///  定义路由对应的页面
 abstract class ModuleRouter implements IModuleRouter {
-  FastRouter router;
+  late FastRouter router;
 
   /// 子类无需调用
   void initRouter(FastRouter router) {
@@ -30,7 +30,7 @@ abstract class ModuleRouter implements IModuleRouter {
 
   ///路径与页匹配
   void define(String path, HandlerFunc handlerFunc,
-      {TransitionType transitionType}) {
+      {TransitionType? transitionType}) {
     router.define(
       path,
       handler: Handler(handlerFunc: handlerFunc),
@@ -48,7 +48,7 @@ abstract class IModuleRouter {
 /// 省略Context 即可调用
 class RouterObserver extends NavigatorObserver {
   /// 静态私有成员，没有初始化
-  static RouterObserver _instance;
+  static RouterObserver? _instance;
   factory RouterObserver() => _getInstance();
 
   /// 私有构造函数 初始化
@@ -59,7 +59,7 @@ class RouterObserver extends NavigatorObserver {
     if (_instance == null) {
       _instance = RouterObserver._internal();
     }
-    return _instance;
+    return _instance!;
   }
 }
 
@@ -94,21 +94,20 @@ class FastRouter {
   final RouteTree _routeTree = RouteTree();
 
   /// 未定义路线时的通用处理
-  Handler notFoundHandler;
+  Handler? notFoundHandler;
 
-  static FastRouter _router;
-
+  static late FastRouter _router;
   static FastRouter get router => _router;
 
   /// 自定义路由观察者
   static RouterObserver get observer => RouterObserver();
 
   /// 观察者对象的上下文
-  static BuildContext get context => RouterObserver().navigator.context;
+  static BuildContext get context => RouterObserver().navigator!.context;
 
   /// 配置路由
   static void configureRouters(FastRouter config, List<ModuleRouter> listRouter,
-      {Handler emptyPage, Duration transitionDuration}) {
+      {Handler? emptyPage, Duration? transitionDuration}) {
     FastRouter._router = config;
 
     /// 指定路由跳转错误返回页
@@ -129,7 +128,7 @@ class FastRouter {
 
   /// 为传递的[RouteHandler]创建[PageRoute]定义。您可以选择提供默认的过渡类型。
   void define(String routePath,
-      {@required Handler handler, TransitionType transitionType}) {
+      {required Handler handler, TransitionType? transitionType}) {
     _routeTree.addRoute(
       AppRoute(routePath, handler, transitionType: transitionType),
     );
@@ -140,7 +139,7 @@ class FastRouter {
     var routeSettings = RouteSettings(name: path);
     return MaterialPageRoute<Null>(
       settings: routeSettings,
-      builder: (context) => notFoundHandler.handlerFunc(context, null, null),
+      builder: (context) => notFoundHandler!.handlerFunc(context, null, null),
     );
   }
 
@@ -181,20 +180,20 @@ class FastRouter {
   }
 
   /// [targetPath]目标页面   [openPage]打开页面  [result]数据
-  static popBack({String targetPath, String openPage, result}) {
+  static popBack({String? targetPath, String? openPage, result}) {
     _router._popBack(
         targetPath: targetPath, showPage: openPage, result: result);
   }
 
   static push(
     String path, {
-    String targetPath,
+    String? targetPath,
     bool replace = false,
-    Object arguments,
-    RouterCallback callback,
-    TransitionType transition,
-    Duration transitionDuration,
-    RouteTransitionsBuilder transitionBuilder,
+    Object? arguments,
+    RouterCallback? callback,
+    TransitionType? transition,
+    Duration? transitionDuration,
+    RouteTransitionsBuilder? transitionBuilder,
   }) {
     _router
         ._navigate(
@@ -212,26 +211,26 @@ class FastRouter {
   }
 
   /// 回退
-  _popBack({String targetPath, String showPage, result}) {
+  _popBack({String? targetPath, String? showPage, result}) {
     if (showPage != null && showPage.isNotEmpty) {
       FastRouter._router._navigate(showPage,
           targetPath: targetPath, replace: true, pop: true);
     } else if (targetPath != null && targetPath.isNotEmpty) {
-      observer.navigator.popUntil(withName(targetPath));
+      observer.navigator?.popUntil(withName(targetPath));
     } else {
-      observer.navigator.pop(result);
+      observer.navigator?.pop(result);
     }
   }
 
   /// 跳转页面
   Future _navigate(
     String showPath, {
-    String targetPath,
+    String? targetPath,
     bool replace = false,
-    Object arguments,
-    TransitionType transition,
-    Duration transitionDuration,
-    RouteTransitionsBuilder transitionBuilder,
+    Object? arguments,
+    TransitionType? transition,
+    Duration? transitionDuration,
+    RouteTransitionsBuilder? transitionBuilder,
     bool pop = false,
   }) {
     RouteMatch routeMatch = _matchRoute(showPath,
@@ -240,7 +239,7 @@ class FastRouter {
         arguments: arguments,
         transitionsBuilder: transitionBuilder,
         transitionDuration: transitionDuration);
-    Route<dynamic> route = routeMatch.route;
+    Route<dynamic>? route = routeMatch.route;
     Completer completer = Completer();
     Future future = completer.future;
     if (routeMatch.matchType == RouteMatchType.nonVisual) {
@@ -263,48 +262,48 @@ class FastRouter {
   }
 
   /// 跳转行为
-  Future _action(bool replace, Route route, String targetPath,
-      {String showPath, bool pop = false}) {
+  Future _action(bool replace, Route route, String? targetPath,
+      {String? showPath, bool pop = false}) {
     var future;
     var clearStack = targetPath != null && targetPath.isNotEmpty;
     if (pop) {
       if (showPath != null && showPath.isNotEmpty) {
-        future = observer.navigator
-            .popAndPushNamed(showPath, result: withName(targetPath));
+        future = observer.navigator!
+            .popAndPushNamed(showPath, result: withName(targetPath!));
       } else {
         future = Future.sync(
-            () => observer.navigator.popUntil(withName(targetPath)));
+            () => observer.navigator?.popUntil(withName(targetPath!)));
       }
     } else {
       if (clearStack) {
-        future =
-            observer.navigator.pushAndRemoveUntil(route, withName(targetPath));
+        future = observer.navigator
+            ?.pushAndRemoveUntil(route, withName(targetPath!));
       } else {
         future = replace
-            ? observer.navigator.pushReplacement(route)
-            : observer.navigator.push(route);
+            ? observer.navigator?.pushReplacement(route)
+            : observer.navigator?.push(route);
       }
     }
     return future;
   }
 
   /// 匹配路由 [arguments] 参数
-  RouteMatch _matchRoute(String path,
-      {BuildContext buildContext,
-      Object arguments,
-      TransitionType transitionType,
-      Duration transitionDuration,
-      RouteTransitionsBuilder transitionsBuilder}) {
-    AppRouteMatch match = _routeTree.matchRoute(path);
-    AppRoute route = match?.route;
+  RouteMatch _matchRoute(String? path,
+      {BuildContext? buildContext,
+      Object? arguments,
+      TransitionType? transitionType,
+      Duration? transitionDuration,
+      RouteTransitionsBuilder? transitionsBuilder}) {
+    AppRouteMatch? match = _routeTree.matchRoute(path);
+    AppRoute? route = match?.route;
     Handler handler = (route != null ? route.handler : notFoundHandler);
 
     /// 参数
-    Map<String, List<String>> parameters = match?.parameters;
+    Map<String, List<String>>? parameters = match?.parameters;
 
     RouteSettings _settings = RouteSettings(
       name: path,
-      arguments: arguments ?? parameters.isEmpty ? null : parameters,
+      arguments: (arguments ?? parameters?.isEmpty) as bool ? null : parameters,
     );
 
     var type = transitionType ?? route?.transitionType ?? TransitionType.native;
@@ -330,12 +329,12 @@ class FastRouter {
       RouteSettings settings,
       Handler handler,
       TransitionType type,
-      RouteTransitionsBuilder transitionsBuilder,
-      Duration transitionDuration) {
+      RouteTransitionsBuilder? transitionsBuilder,
+      Duration? transitionDuration) {
     bool isNativeTransition =
         (type == TransitionType.native || type == TransitionType.nativeModal);
     var _arguments = settings.arguments;
-    Map<String, List<String>> _parameters;
+    Map<String, List<String>>? _parameters;
 
     if (_arguments is Map<String, List<String>>) _parameters = _arguments;
     if (isNativeTransition) {
@@ -387,7 +386,7 @@ class FastRouter {
   /// Route generation method. This function can be used as a way to create routes on-the-fly
   /// if any defined handler is found. It can also be used with the [MaterialApp.onGenerateRoute]
   /// property as callback to create routes that can be used with the [Navigator] class.
-  Route<dynamic> generator(RouteSettings routeSettings) {
+  Route<dynamic>? generator(RouteSettings routeSettings) {
     RouteMatch match =
         _matchRoute(routeSettings.name, arguments: routeSettings.arguments);
     return match.route;

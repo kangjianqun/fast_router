@@ -165,7 +165,7 @@ class RouteTree {
         /// 是否匹配到路径
         bool isMatch = (node.part == pathPart || node.isParameter());
         if (isMatch) {
-          RouteTreeNodeMatch parentMatch = nodeMatches[node.parent]!;
+          RouteTreeNodeMatch? parentMatch = nodeMatches[node.parent];
           RouteTreeNodeMatch match =
               RouteTreeNodeMatch.fromMatch(parentMatch, node);
           if (node.isParameter()) {

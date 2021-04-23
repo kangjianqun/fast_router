@@ -303,7 +303,7 @@ class FastRouter {
 
     RouteSettings _settings = RouteSettings(
       name: path,
-      arguments: (arguments ?? parameters?.isEmpty) as bool ? null : parameters,
+      arguments: arguments ?? (parameters != null ? parameters : null),
     );
 
     var type = transitionType ?? route?.transitionType ?? TransitionType.native;

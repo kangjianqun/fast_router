@@ -277,7 +277,7 @@ class FastRouter {
     } else {
       if (clearStack) {
         future = observer.navigator
-            ?.pushAndRemoveUntil(route, withName(targetPath!));
+            ?.pushAndRemoveUntil(route, withName(targetPath));
       } else {
         future = replace
             ? observer.navigator?.pushReplacement(route)

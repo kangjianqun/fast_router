@@ -23,6 +23,7 @@ class ArticleItem {
 class ArticleVM
     extends BaseListViewModel<UserModel, ArticleEntity, ArticleItem> {
   ArticleVM(this.isLoadData);
+
   bool isLoadData = true;
 
   /// 首次加载
@@ -30,13 +31,15 @@ class ArticleVM
   ValueNotifier<String> vnTime = ValueNotifier("暂无");
 
   @override
-  void jointList(ArticleEntity newEntity) => entity.list.addAll(newEntity.list);
+  void jointList(ArticleEntity newEntity) =>
+      entity?.list.addAll(newEntity.list);
 
   @override
-  List<ArticleItem> get list => entity?.list;
+  List<ArticleItem> get list => entity!.list;
+
   @override
-  Future<DataResponse<ArticleEntity>> requestHttp(
-      {bool isLoad, int page, params}) {
+  Future<DataResponse<ArticleEntity>?>? requestHttp(bool isLoad, int page,
+      {params}) {
     /// 判断是否加载数据， 测试状态页用
     if (!isLoadData && firstLoad) {
       firstLoad = false;
@@ -71,7 +74,7 @@ class ArticleParamsData {
 class ArticlePage extends StatelessWidget with BaseView<ArticleVM> {
   const ArticlePage(
     this.rootRefresh, {
-    Key key,
+    Key? key,
     this.configState = false,
     this.loadData = true,
   }) : super(key: key);
@@ -82,7 +85,7 @@ class ArticlePage extends StatelessWidget with BaseView<ArticleVM> {
   final bool loadData;
 
   @override
-  ViewConfig<ArticleVM> initConfig(BuildContext context) {
+  ViewConfig<ArticleVM> initConfig() {
     var _empty = configState ? (vm) => Center(child: Text("单独配置：empty")) : null;
     return rootRefresh
         ? ViewConfig<ArticleVM>(vm: ArticleVM(loadData), empty: _empty)
@@ -91,7 +94,7 @@ class ArticlePage extends StatelessWidget with BaseView<ArticleVM> {
 
   @override
   Widget vmBuild(
-      BuildContext context, ArticleVM vm, Widget child, Widget state) {
+      BuildContext context, ArticleVM vm, Widget? child, Widget? state) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: Text("文章")),

@@ -5,18 +5,18 @@ import 'package:flutter/widgets.dart';
 import 'article.dart';
 
 class Routers extends ModuleRouter {
-  static String _article = "/article";
-  static String _empty = "/empty";
+  static const String _article = "/article";
+  static const String _empty = "/empty";
 
   static void articlePage(bool rootRefresh, bool configState, bool loadData,
       bool isNew, bool isNavigator) {
     if (isNew) {
-      var _arguments = ArticleParamsData(rootRefresh, configState, loadData);
+      var arguments = ArticleParamsData(rootRefresh, configState, loadData);
       if (isNavigator) {
         Navigator.of(FastRouter.context)
-            .pushNamed(_article, arguments: _arguments);
+            .pushNamed(_article, arguments: arguments);
       } else {
-        FastRouter.push(_article, arguments: _arguments);
+        FastRouter.push(_article, arguments: arguments);
       }
     } else {
       FastRouter.push("$_article?rootRefresh=$rootRefresh"
@@ -31,9 +31,9 @@ class Routers extends ModuleRouter {
     define(
       _article,
       (context, parameters, arguments) {
-        var rootRefresh;
-        var configState;
-        var loadData;
+        bool rootRefresh = false;
+        bool configState = false;
+        bool loadData = false;
         if (parameters != null) {
           rootRefresh = parse(parameters["rootRefresh"]?.first);
           configState = parse(parameters["configState"]?.first);
@@ -52,7 +52,7 @@ class Routers extends ModuleRouter {
       transitionType: TransitionType.fadeIn,
     );
 
-    define(_empty, (context, parameters, arguments) => EmptyPage());
+    define(_empty, (context, parameters, arguments) => const EmptyPage());
   }
 
   ///因为相互依赖这里不能依赖 fast_develop ，正常项目依赖fast_develop这个库就行，

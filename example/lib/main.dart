@@ -8,17 +8,17 @@ import 'article.dart';
 import 'routers.dart';
 
 void main() {
-  runApp(App());
+  runApp(const App());
 }
 
 class UserModel extends BaseModel {
   Future<bool> login(String account, String psd) async {
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 3));
     return true;
   }
 
   Future<DataResponse<ArticleEntity>> getArticleList() async {
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
 
     var entity = ArticleEntity([
       ArticleItem("1", "好的", "内容内容内容内容内容", DateTime.now().toString()),
@@ -32,8 +32,10 @@ class UserModel extends BaseModel {
 }
 
 class App extends StatefulWidget {
+  const App({Key? key}) : super(key: key);
+
   @override
-  _AppState createState() => _AppState();
+  State<App> createState() => _AppState();
 }
 
 class _AppState extends State<App> {
@@ -62,7 +64,7 @@ class _AppState extends State<App> {
       debugShowCheckedModeBanner: false,
       navigatorObservers: [FastRouter.observer],
       onGenerateRoute: FastRouter.router.generator,
-      home: SelectPage(),
+      home: const SelectPage(),
     );
   }
 }
@@ -73,6 +75,8 @@ class SelectVM extends BaseViewModel {
 }
 
 class SelectPage extends StatelessWidget with BaseView<SelectVM> {
+  const SelectPage({Key? key}) : super(key: key);
+
   @override
   ViewConfig<SelectVM> initConfig() => ViewConfig(vm: SelectVM());
 
@@ -83,14 +87,14 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
   }
 
   @override
-  Widget vmBuild(
+  Widget vBuild(
       BuildContext context, SelectVM vm, Widget? child, Widget? state) {
     return Scaffold(
-      appBar: AppBar(title: Text("选择")),
+      appBar: AppBar(title: const Text("选择")),
       body: ListView(
         children: <Widget>[
           ListTile(
-            title: Text("是否加载数据,用来测试状态页和重新加载数据"),
+            title: const Text("是否加载数据,用来测试状态页和重新加载数据"),
             trailing: ValueListenableBuilder<bool>(
               valueListenable: vm.isLoadData,
               builder: (_, value, __) => Switch(
@@ -100,7 +104,7 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
             ),
           ),
           ListTile(
-            title: Text("是否单独配置状态页,用来测试状态页和重新加载数据"),
+            title: const Text("是否单独配置状态页,用来测试状态页和重新加载数据"),
             trailing: ValueListenableBuilder<bool>(
               valueListenable: vm.isConfigState,
               builder: (_, value, __) => Switch(
@@ -110,17 +114,17 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
             ),
           ),
           ListTile(
-            title: Text("根布局刷新"),
+            title: const Text("根布局刷新"),
             onTap: () =>
                 pushArticle(true, vm.isConfigState.value, vm.isLoadData.value),
           ),
           ListTile(
-            title: Text("根布局不刷新"),
+            title: const Text("根布局不刷新"),
             onTap: () =>
                 pushArticle(false, vm.isConfigState.value, vm.isLoadData.value),
           ),
           ListTile(
-            title: Text("新的参数方式"),
+            title: const Text("新的参数方式"),
             onTap: () => pushArticle(
               true,
               vm.isConfigState.value,
@@ -129,7 +133,7 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
             ),
           ),
           ListTile(
-            title: Text("Navigator的参数方式"),
+            title: const Text("Navigator的参数方式"),
             onTap: () => pushArticle(
               true,
               vm.isConfigState.value,
@@ -139,7 +143,7 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
             ),
           ),
           ListTile(
-            title: Text("空页面，不传参数"),
+            title: const Text("空页面，不传参数"),
             onTap: () => Routers.emptyPage(),
           ),
         ],

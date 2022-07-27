@@ -10,8 +10,8 @@ import 'tree.dart';
 typedef RouterCallback = void Function(dynamic data);
 
 Color fastRouterBgColor = Colors.white;
-Duration fastRouterTransitionDuration = Duration(milliseconds: 250);
-Widget notFoundWidget = Center(child: Text("未找到目标页面"));
+Duration fastRouterTransitionDuration = const Duration(milliseconds: 250);
+Widget notFoundWidget = const Center(child: Text("未找到目标页面"));
 
 initRouter(Color? backgroundColor, Widget? notFoundPage) {
   if (backgroundColor != null) fastRouterBgColor = backgroundColor;
@@ -49,6 +49,7 @@ abstract class IModuleRouter {
 class RouterObserver extends NavigatorObserver {
   /// 静态私有成员，没有初始化
   static RouterObserver? _instance;
+
   factory RouterObserver() => _getInstance();
 
   /// 私有构造函数 初始化
@@ -56,9 +57,7 @@ class RouterObserver extends NavigatorObserver {
 
   /// 静态、同步、私有访问点
   static RouterObserver _getInstance() {
-    if (_instance == null) {
-      _instance = RouterObserver._internal();
-    }
+    _instance ??= RouterObserver._internal();
     return _instance!;
   }
 }
@@ -97,6 +96,7 @@ class FastRouter {
   Handler? notFoundHandler;
 
   static late FastRouter _router;
+
   static FastRouter get router => _router;
 
   /// 自定义路由观察者
@@ -119,11 +119,13 @@ class FastRouter {
       },
     );
 
-    if (transitionDuration != null)
+    if (transitionDuration != null) {
       fastRouterTransitionDuration = transitionDuration;
+    }
 
-    listRouter
-        .forEach((moduleRouter) => moduleRouter.initRouter(FastRouter._router));
+    for (var moduleRouter in listRouter) {
+      moduleRouter.initRouter(FastRouter._router);
+    }
   }
 
   /// 为传递的[RouteHandler]创建[PageRoute]定义。您可以选择提供默认的过渡类型。
@@ -135,9 +137,9 @@ class FastRouter {
   }
 
   /// 未找到路径
-  Route<Null> _notFoundRoute(String path) {
+  Route<void> _notFoundRoute(String path) {
     var routeSettings = RouteSettings(name: path);
-    return MaterialPageRoute<Null>(
+    return MaterialPageRoute<void>(
       settings: routeSettings,
       builder: (context) => notFoundHandler!.handlerFunc(context, null, null),
     );
@@ -150,9 +152,9 @@ class FastRouter {
       if (transitionType == TransitionType.fadeIn) {
         return FadeTransition(opacity: animation, child: child);
       } else {
-        const Offset topLeft = const Offset(0.0, 0.0);
-        const Offset topRight = const Offset(1.0, 0.0);
-        const Offset bottomLeft = const Offset(0.0, 1.0);
+        const Offset topLeft = Offset(0.0, 0.0);
+        const Offset topRight = Offset(1.0, 0.0);
+        const Offset bottomLeft = Offset(0.0, 1.0);
         Offset startOffset = bottomLeft;
         Offset endOffset = topLeft;
         if (transitionType == TransitionType.inFromLeft) {
@@ -172,6 +174,10 @@ class FastRouter {
         );
       }
     };
+  }
+
+  static Future<T?> pushPlatform<T>() {
+    return platform.invokeMethod("jumpToPage");
   }
 
   /// dialog  pop
@@ -264,7 +270,7 @@ class FastRouter {
   /// 跳转行为
   Future _action(bool replace, Route route, String? targetPath,
       {String? showPath, bool pop = false}) {
-    var future;
+    Future? future;
     var clearStack = targetPath != null && targetPath.isNotEmpty;
     if (pop) {
       if (showPath != null && showPath.isNotEmpty) {
@@ -276,15 +282,15 @@ class FastRouter {
       }
     } else {
       if (clearStack) {
-        future = observer.navigator
-            ?.pushAndRemoveUntil(route, withName(targetPath));
+        future =
+            observer.navigator?.pushAndRemoveUntil(route, withName(targetPath));
       } else {
         future = replace
             ? observer.navigator?.pushReplacement(route)
             : observer.navigator?.push(route);
       }
     }
-    return future;
+    return future!;
   }
 
   /// 匹配路由 [arguments] 参数
@@ -301,9 +307,9 @@ class FastRouter {
     /// 参数
     Map<String, List<String>>? parameters = match?.parameters;
 
-    RouteSettings _settings = RouteSettings(
+    RouteSettings settings = RouteSettings(
       name: path,
-      arguments: arguments ?? (parameters != null ? parameters : null),
+      arguments: arguments ?? parameters,
     );
 
     var type = transitionType ?? route?.transitionType ?? TransitionType.native;
@@ -320,7 +326,7 @@ class FastRouter {
     return RouteMatch(
       matchType: RouteMatchType.visual,
       route: _creatorRouter(
-          _settings, handler, type, transitionsBuilder, transitionDuration),
+          settings, handler, type, transitionsBuilder, transitionDuration),
     );
   }
 
@@ -333,23 +339,23 @@ class FastRouter {
       Duration? transitionDuration) {
     bool isNativeTransition =
         (type == TransitionType.native || type == TransitionType.nativeModal);
-    var _arguments = settings.arguments;
-    Map<String, List<String>>? _parameters;
+    var arguments = settings.arguments;
+    Map<String, List<String>>? parameters;
 
-    if (_arguments is Map<String, List<String>>) _parameters = _arguments;
+    if (arguments is Map<String, List<String>>) parameters = arguments;
     if (isNativeTransition) {
       if (Platform.isIOS) {
         return CupertinoPageRoute<dynamic>(
             settings: settings,
             fullscreenDialog: type == TransitionType.nativeModal,
             builder: (context) =>
-                handler.handlerFunc(context, _parameters, _arguments));
+                handler.handlerFunc(context, parameters, arguments));
       } else {
         return MaterialPageRoute<dynamic>(
             settings: settings,
             fullscreenDialog: type == TransitionType.nativeModal,
             builder: (context) =>
-                handler.handlerFunc(context, _parameters, _arguments));
+                handler.handlerFunc(context, parameters, arguments));
       }
     } else if (type == TransitionType.material ||
         type == TransitionType.materialFullScreenDialog) {
@@ -357,26 +363,26 @@ class FastRouter {
           settings: settings,
           fullscreenDialog: type == TransitionType.materialFullScreenDialog,
           builder: (context) =>
-              handler.handlerFunc(context, _parameters, _arguments));
+              handler.handlerFunc(context, parameters, arguments));
     } else if (type == TransitionType.cupertino ||
         type == TransitionType.cupertinoFullScreenDialog) {
       return CupertinoPageRoute<dynamic>(
           settings: settings,
           fullscreenDialog: type == TransitionType.cupertinoFullScreenDialog,
           builder: (context) =>
-              handler.handlerFunc(context, _parameters, _arguments));
+              handler.handlerFunc(context, parameters, arguments));
     } else {
-      var routeTransitionsBuilder;
+      RouteTransitionsBuilder? routeTransitionsBuilder;
       if (type == TransitionType.custom) {
         routeTransitionsBuilder = transitionsBuilder;
-      } else {
-        routeTransitionsBuilder = _standardTransitionsBuilder(type);
       }
+      routeTransitionsBuilder ??= _standardTransitionsBuilder(type);
+
       return PageRouteBuilder<dynamic>(
         settings: settings,
         pageBuilder: (context, Animation<double> animation,
                 Animation<double> secondaryAnimation) =>
-            handler.handlerFunc(context, _parameters, _arguments),
+            handler.handlerFunc(context, parameters, arguments),
         transitionDuration: transitionDuration ?? fastRouterTransitionDuration,
         transitionsBuilder: routeTransitionsBuilder,
       );

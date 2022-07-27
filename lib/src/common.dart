@@ -1,4 +1,8 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+
+//平台通道
+const platform = MethodChannel("flutter.jump.platform");
 
 /// 类型
 enum HandlerType {
@@ -9,12 +13,13 @@ enum HandlerType {
 /// 处理
 class Handler {
   Handler({this.type = HandlerType.route, required this.handlerFunc});
+
   final HandlerType type;
   final HandlerFunc handlerFunc;
 }
 
 ///
-typedef Widget HandlerFunc(BuildContext? context,
+typedef HandlerFunc = Widget Function(BuildContext? context,
     Map<String, List<String>>? parameters, Object? arguments);
 
 /// 路由item
@@ -22,6 +27,7 @@ class AppRoute {
   String route;
   dynamic handler;
   TransitionType? transitionType;
+
   AppRoute(this.route, this.handler, {this.transitionType});
 }
 
@@ -47,10 +53,10 @@ enum RouteMatchType {
 
 ///
 class RouteMatch {
-  RouteMatch(
-      {this.matchType = RouteMatchType.noMatch,
-      this.route,
-      this.errorMessage = "Unable to match route. Please check the logs."});
+  RouteMatch({this.matchType = RouteMatchType.noMatch,
+    this.route,
+    this.errorMessage = "Unable to match route. Please check the logs."});
+
   final Route<dynamic>? route;
   final RouteMatchType matchType;
   final String errorMessage;
@@ -59,6 +65,7 @@ class RouteMatch {
 class RouteNotFoundException implements Exception {
   final String message;
   final String path;
+
   RouteNotFoundException(this.message, this.path);
 
   @override

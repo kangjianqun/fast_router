@@ -133,16 +133,18 @@ class ArticlePage extends StatelessWidget with BaseView<ArticleVM> {
               ),
               ListOrGridEmpty.max(
                 vm: vm,
-                childBuild: () => EasyRefresh(
-                  controller: vm.refreshController,
-                  onLoad: vm.loadMore,
-                  onRefresh: vm.pullRefresh,
-                  child: ListView.builder(
-                    itemCount: vm.list.length,
-                    itemBuilder: (ctx, index) {
-                      return Selector<ArticleVM, ArticleItem>(
-                        selector: (_, aVM) => aVM.list[index],
-                        shouldRebuild: (pre, next) => pre == next,
+                useViewSizeType: true,
+                childBuild: () =>
+                    EasyRefresh(
+                      controller: vm.refreshController,
+                      onLoad: vm.loadMore,
+                      onRefresh: vm.pullRefresh,
+                      child: ListView.builder(
+                        itemCount: vm.list.length,
+                        itemBuilder: (ctx, index) {
+                          return Selector<ArticleVM, ArticleItem>(
+                            selector: (_, aVM) => aVM.list[index],
+                            shouldRebuild: (pre, next) => pre == next,
                         builder: (_, ArticleItem value, __) => _item(value),
                       );
                     },

@@ -1,4 +1,5 @@
 import 'package:example/EmptyPage.dart';
+import 'package:example/nFlutter.dart';
 import 'package:fast_router/fast_router.dart';
 import 'package:flutter/widgets.dart';
 
@@ -7,9 +8,10 @@ import 'article.dart';
 class Routers extends ModuleRouter {
   static const String _article = "/article";
   static const String _empty = "/empty";
+  static const String _flutter = "/flutter";
 
   static void articlePage(bool rootRefresh, bool configState, bool loadData,
-      bool isNew, bool isNavigator) {
+      {bool isNew = false, bool isNavigator = false}) {
     if (isNew) {
       var arguments = ArticleParamsData(rootRefresh, configState, loadData);
       if (isNavigator) {
@@ -25,6 +27,13 @@ class Routers extends ModuleRouter {
   }
 
   static void emptyPage() => FastRouter.push(_empty);
+
+  static Future<T?> jumpNative<T>() => FastRouter.pushPlatform();
+
+  static nativeToFlutter() {
+    print('FastRouter.push(_flutter)');
+    return FastRouter.push(_flutter);
+  }
 
   @override
   void initPath() {
@@ -53,6 +62,9 @@ class Routers extends ModuleRouter {
     );
 
     define(_empty, (context, parameters, arguments) => const EmptyPage());
+    define(_flutter, (context, parameters, arguments) {
+      return const NFlutter();
+    });
   }
 
   ///因为相互依赖这里不能依赖 fast_develop ，正常项目依赖fast_develop这个库就行，

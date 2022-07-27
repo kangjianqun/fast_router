@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+
 import 'common.dart';
 
 /// 节点类型
@@ -182,19 +183,17 @@ class RouteTree {
       }
       nodeMatches = currentMatches;
       nodesToCheck = nextNodes;
-      if (currentMatches.values.length == 0) {
-        return null;
-      }
+      if (currentMatches.values.isEmpty) return null;
     }
 
     List<RouteTreeNodeMatch> matches = nodeMatches.values.toList();
-    if (matches.length > 0) {
+    if (matches.isNotEmpty) {
       RouteTreeNodeMatch match = matches.first;
       RouteTreeNode? nodeToUse = match.node;
 //			print("using match: ${match}, ${nodeToUse?.part}, ${match?.parameters}");
       if (nodeToUse != null &&
           nodeToUse.routes != null &&
-          nodeToUse.routes!.length > 0) {
+          nodeToUse.routes!.isNotEmpty) {
         List<AppRoute> routes = nodeToUse.routes!;
         AppRouteMatch routeMatch = AppRouteMatch(routes[0]);
         routeMatch.parameters = match.parameters;
@@ -214,7 +213,7 @@ class RouteTree {
         indent += "    ";
       }
       print("$indent${node.part}: total routes=${node.routes?.length}");
-      if (node.nodes != null && node.nodes!.length > 0) {
+      if (node.nodes != null && node.nodes!.isNotEmpty) {
         _printSubTree(parent: node, level: level + 1);
       }
     }
@@ -252,7 +251,7 @@ class RouteTree {
   /// 解析查询字符串 取出参数
   Map<String, List<String>> parseQueryString(String query) {
     var search = RegExp('([^&=]+)=?([^&]*)');
-    var params = Map<String, List<String>>();
+    var params = <String, List<String>>{};
     if (query.startsWith('?')) query = query.substring(1);
 
     ///

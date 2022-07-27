@@ -1,7 +1,6 @@
+import 'package:fast_mvvm/fast_mvvm.dart';
 import 'package:fast_router/fast_router.dart';
 import 'package:flutter/material.dart';
-
-import 'package:fast_mvvm/fast_mvvm.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 import 'article.dart';
@@ -26,7 +25,7 @@ class UserModel extends BaseModel {
     ]);
 
     DataResponse<ArticleEntity> dataResponse =
-        DataResponse<ArticleEntity>(entity: entity, totalPageNum: 3);
+    DataResponse<ArticleEntity>(entity: entity, totalPageNum: 3);
     return dataResponse;
   }
 }
@@ -55,6 +54,11 @@ class _AppState extends State<App> {
               .finishLoad(success: success, noMore: noMore),
     );
     FastRouter.configureRouters(FastRouter(), [Routers()]);
+
+    platform.setMethodCallHandler((call) async {
+      print('platform.setMethodCallHandler((call)');
+      Routers.nativeToFlutter();
+    });
     super.initState();
   }
 
@@ -78,17 +82,10 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
   const SelectPage({Key? key}) : super(key: key);
 
   @override
-  ViewConfig<SelectVM> initConfig() => ViewConfig(vm: SelectVM());
-
-  void pushArticle(bool rootRefresh, bool isConfigState, bool isLoadData,
-      {bool isNew = false, bool isNavigator = false}) {
-    Routers.articlePage(
-        rootRefresh, isConfigState, isLoadData, isNew, isNavigator);
-  }
+  ViewConfig<SelectVM> initConfig() => ViewConfig.noLoad(vm: SelectVM());
 
   @override
-  Widget vBuild(
-      BuildContext context, SelectVM vm, Widget? child, Widget? state) {
+  Widget vBuild(BuildContext context, SelectVM vm, Widget? child, Widget? state) {
     return Scaffold(
       appBar: AppBar(title: const Text("选择")),
       body: ListView(
@@ -115,17 +112,17 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
           ),
           ListTile(
             title: const Text("根布局刷新"),
-            onTap: () =>
-                pushArticle(true, vm.isConfigState.value, vm.isLoadData.value),
+            onTap: () => Routers.articlePage(
+                true, vm.isConfigState.value, vm.isLoadData.value),
           ),
           ListTile(
             title: const Text("根布局不刷新"),
-            onTap: () =>
-                pushArticle(false, vm.isConfigState.value, vm.isLoadData.value),
+            onTap: () => Routers.articlePage(
+                false, vm.isConfigState.value, vm.isLoadData.value),
           ),
           ListTile(
             title: const Text("新的参数方式"),
-            onTap: () => pushArticle(
+            onTap: () => Routers.articlePage(
               true,
               vm.isConfigState.value,
               vm.isLoadData.value,
@@ -134,7 +131,7 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
           ),
           ListTile(
             title: const Text("Navigator的参数方式"),
-            onTap: () => pushArticle(
+            onTap: () => Routers.articlePage(
               true,
               vm.isConfigState.value,
               vm.isLoadData.value,
@@ -145,6 +142,10 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
           ListTile(
             title: const Text("空页面，不传参数"),
             onTap: () => Routers.emptyPage(),
+          ),
+          ListTile(
+            title: const Text("跳转原生"),
+            onTap: () => Routers.jumpNative(),
           ),
         ],
       ),

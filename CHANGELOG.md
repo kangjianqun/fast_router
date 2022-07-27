@@ -1,10 +1,17 @@
+## 2.0.3
+
+Update SDK 优化demo
+
 ## 2.0.2
+
 Fix parameter passing
 
 ## 2.0.1
+
 Empty security repair
 
 ## 2.0.0
+
 stand by Null safety
 
 ## 1.0.5+1
@@ -27,7 +34,7 @@ FastRouter-> configureRouters  新增 Duration transitionDuration
 路由跳转的过渡时间
 
 ## 1.0.3+2
-ModuleRouter -> define 新增 TransitionType transitionType配置 
+ModuleRouter -> define 新增 TransitionType transitionType配置
 
 ## 1.0.3+1
 删除弃用的方法

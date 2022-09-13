@@ -1,7 +1,7 @@
 name: fast_router
 description: A router management, based on the modified version of fluro, adds more convenient extension function and global implementation without context jump
 version: 2.0.3
-homepage: https://github.com/StrangerKjq/fast_router
+homepage: https://github.com/kangjianqun/fast_router
 
 environment:
   sdk: ">=2.17.0 <3.0.0"

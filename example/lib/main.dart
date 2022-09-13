@@ -25,7 +25,7 @@ class UserModel extends BaseModel {
     ]);
 
     DataResponse<ArticleEntity> dataResponse =
-    DataResponse<ArticleEntity>(entity: entity, totalPageNum: 3);
+        DataResponse<ArticleEntity>(entity: entity, totalPageNum: 3);
     return dataResponse;
   }
 }
@@ -146,6 +146,10 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
           ListTile(
             title: const Text("跳转原生"),
             onTap: () => Routers.jumpNative(),
+          ),
+          ListTile(
+            title: const Text("跳转Flutter嵌套原生View"),
+            onTap: () => Routers.nativeView(),
           ),
         ],
       ),

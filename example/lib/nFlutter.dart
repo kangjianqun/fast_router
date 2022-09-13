@@ -8,7 +8,7 @@ class NFlutter extends StatelessWidget with BaseView {
 
   @override
   ViewConfig<BaseViewModel<BaseModel, BaseEntity>> initConfig() =>
-      ViewConfig.noLoad(vm: NFVM());
+      ViewConfig.noLoad(NFVM());
 
   @override
   Widget vBuild(context, vm, child, state) {

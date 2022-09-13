@@ -90,8 +90,8 @@ class ArticlePage extends StatelessWidget with BaseView<ArticleVM> {
         ? (vm) => const Scaffold(body: Center(child: Text("单独配置：empty")))
         : null;
     return rootRefresh
-        ? ViewConfig<ArticleVM>(vm: ArticleVM(loadData), empty: empty)
-        : ViewConfig<ArticleVM>.noRoot(vm: ArticleVM(loadData), empty: empty);
+        ? ViewConfig<ArticleVM>(ArticleVM(loadData), empty: empty)
+        : ViewConfig<ArticleVM>.noRoot(ArticleVM(loadData), empty: empty);
   }
 
   @override

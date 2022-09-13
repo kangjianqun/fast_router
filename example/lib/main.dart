@@ -82,7 +82,7 @@ class SelectPage extends StatelessWidget with BaseView<SelectVM> {
   const SelectPage({Key? key}) : super(key: key);
 
   @override
-  ViewConfig<SelectVM> initConfig() => ViewConfig.noLoad(vm: SelectVM());
+  ViewConfig<SelectVM> initConfig() => ViewConfig.noLoad(SelectVM());
 
   @override
   Widget vBuild(BuildContext context, SelectVM vm, Widget? child, Widget? state) {
